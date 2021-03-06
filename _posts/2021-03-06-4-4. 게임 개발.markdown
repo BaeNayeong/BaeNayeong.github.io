@@ -1,0 +1,116 @@
+---
+layout: post
+title: 4-4. 게임 개발
+date: 2020-03-06 21:45:00 +0900
+category: algorithms
+---
+# [구현] 4-4. 게임 개발 
+문제 출처: 이것이 취업을 위한 코딩 테스트다 with 파이썬
+<br/>
+<br/>
+
+> 내가 푼 방식
+
+
+문제에서는 왼쪽 방향으로 갈 곳이 정해지기 때문에 0->3->2->1 순서로 반복해서 변한다.&nbsp;여기에서 문제가 막혔다.&nbsp; 나는 그 다음 방향을 가리키는 move_types 리스트를 통해 방향값에 따라서 바라볼 좌표를 만들어주었고, &nbsp; direction 리스트를 통해 인덱스에 따라 0, 3, 2, 1 순서대로 움직일 수 있도록 구현해줄 계획이었다. &nbsp; 주어진 지도에서 방문한 위치는 1로 만들어주었고, 캐릭터가 위치한 칸과 캐릭터의 동서남북 방향의 값이 모두 1인 경우에는 while문을 중단하도록 했다. 내가 작성한 코드는 다음과 같다. <br/><br/>
+
+
+```python
+n, m = map(int, input().split())
+a, b, d = map(int, input().split())
+move_types = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+direction = [0, 3, 2, 1]
+result = 0
+array = []
+
+for _ in range(4):
+    array.append(list(map(int, input().split())))
+
+da = 0
+db = 0
+
+while True:
+    da = a + move_types[direction[d]][0]
+    db = b + move_types[direction[d]][1]
+    array[a][b] = 1
+
+    if array[da][db] == 0:
+        a = da
+        b = db
+        result += 1
+
+    d = (d + 1) % 4
+
+    if array[a-1][0] == 1 and array[a][b-1] == 1 and array[a+1][b] == 1 and array[a][b+1] == 1 and array[a][b] == 1:
+        break
+
+print(result)
+
+```
+
+
+위 코드는 오류가 있는 코드다.&nbsp; 만약에 동쪽을 가리키는 d=1로 시작할 경우, move_types[direction[d]] 는 move_types[3] 이 되고 서쪽을 가리키게 된다. 0->3->2->1 순서대로 변한다는 것에 신경쓰느라 구현 방법을 잘못 생각했다. 
+<br/>
+<br/>
+
+
+> 답안지 풀이
+
+※ 책 코드를 읽어본 뒤에 푼 거라 책과 순서가 조금 다를 수 있다.
+<br/>
+내가 고민했던 부분을 turn_left() 함수로 별도로 구현함으로써 간단하게 해결했다.&nbsp; direction 변수가 전역변수이기 때문에 global 키워드를 사용하여 구현했다. 방문했는지 여부를 나타내는 visited 2차원 리스트를 별도로 구현해주었다. 또한 나는 북동남서 방향과 현재 방향이 모두 1인지 체크해준 뒤에서야 중단시킬 수 있게 코드를 짰는데 답안에서는 turn_times 변수를 통해 방향을 몇 번 틀었는지 나타내줌으로써 turn_times의 값만 검사하는 것으로 break할 지점을 찾게 했다.&nbsp; 현재 위치에서 한 칸 이동한 다음의 위치가 이동 가능한지 불가능한지 검사한다는 아이디어는 똑같았지만 세부적인 사항을 좀 더 깊게 생각했다는 점이 다른 것 같다.&nbsp; 코드는 다음과 같다.
+
+```python
+n, m = map(int, input().split())
+x, y, direction = map(int, input().split())
+array = []
+
+for i in range(n):
+    array.append(list(map(int, input().split())))
+
+dx = [0, 1, 0, -1]
+dy = [-1, 0, 1, 0]
+
+
+def turn_left():
+    global direction
+    direction -= 1
+    if direction == -1:
+        direction = 3
+
+
+count = 1
+turn_times = 0
+
+visited = [[0]*m for _ in range(n)] # 방문했는지 여부 나타냄
+visited[x][y] = 1
+
+while True:
+    turn_left()
+    nx = x + dx[direction]
+    ny = y + dy[direction]
+
+    if array[nx][ny] == 0 and visited[nx][ny] == 0:
+        visited[nx][ny] = 1
+        x = nx
+        y = ny
+        count += 1
+        turn_times = 0
+        continue
+    else:
+        turn_times += 1
+
+    if turn_times == 4:
+        nx = x - dx[direction]
+        ny = y - dy[direction]
+
+        if array[nx][ny] == 0:
+            x = nx
+            y = ny
+        else:
+            break
+        turn_times = 0
+
+print(count)
+
+```
