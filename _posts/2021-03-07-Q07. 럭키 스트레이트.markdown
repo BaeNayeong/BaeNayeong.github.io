@@ -1,0 +1,40 @@
+---
+layout: post
+title: Q07. 럭키 스트레이트
+date: 2020-03-07 13:20:00 +0900
+category: algorithms
+---
+# [구현] Q07. 럭키 스트레이트
+* 문제 출처: 이것이 취업을 위한 코딩 테스트다 with 파이썬
+<br/>
+<br/>
+
+> 내가 푼 방식
+
+
+오른쪽 부분과 왼쪽 부분을 구분해서 더해주는 문제이기 때문에 String형으로 입력을 받고 인덱스로 접근하는 방식으로 문제를 풀었다.
+<br/>
+
+
+```python
+str = input()
+sum_left = 0
+sum_right = 0
+
+for i in range(len(str)//2):
+    sum_left += int(str[i])
+    sum_right += int(str[len(str)-1-i])
+
+if sum_left == sum_right:
+    print("LUCKY")
+else:
+    print("READY")
+```
+
+
+<br/>
+
+
+> 답안지 풀이
+
+답안지에서는 내 코드처럼 sum_left, sum_right로 나누는 대신 summary라는 변수 하나에 왼쪽은 더하고, 오른쪽은 빼주는 방식으로 문제를 해결하였다.&nbsp;  
